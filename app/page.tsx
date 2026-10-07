@@ -1,198 +1,298 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
-import { ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Menu, Search, X } from 'lucide-react'
+import {
+  ArrowDownRight,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Mail,
+  Menu,
+  User,
+  X,
+} from 'lucide-react'
+
+/**
+ * Path of your logo inside /public.
+ * If /logo.png doesn't exist, try '/images/logo-light.svg' or '/images/logo-gold.svg'.
+ */
+const LOGO_SRC = '/logo.png'
+
+const NAV_ITEMS = [
+  { label: 'Home', id: 'home' },
+  { label: 'About', id: 'about' },
+  { label: 'Team', id: 'team' },
+  { label: 'Services', id: 'services' },
+  { label: 'Portfolio', id: 'portfolio' },
+  { label: 'Philosophy', id: 'philosophy' },
+  { label: 'Process', id: 'process' },
+  { label: 'Contact', id: 'contact' },
+]
 
 const specialisations = [
   ['01', 'RESIDENTIAL', 'Homes designed for generations.', 'hero-interior.png'],
-  ['02', 'COMMERCIAL', 'Spaces that elevate business performance.', 'kigo-residence.png'],
+  ['02', 'COMMERCIAL & CORPORATE', 'Spaces that elevate business performance.', 'kigo-residence.png'],
   ['03', 'HOSPITALITY', 'Experiences people remember.', 'hero-interior.png'],
-  ['04', 'LANDSCAPES', 'Outdoor spaces in harmony with nature.', 'kigo-residence.png'],
+  ['04', 'HEALTHCARE & INSTITUTIONAL', 'Environments designed for healing and learning.', 'kigo-residence.png'],
+  ['05', 'RETAIL & LANDSCAPES', 'Immersive spatial experiences in harmony with nature.', 'hero-interior.png'],
 ]
 
 const processSteps = [
   {
     number: '01',
     title: 'Discover',
-    description: 'We begin by understanding your lifestyle, goals, preferences, and the atmosphere you want your home to hold.',
+    description: 'We listen carefully and observe thoughtfully to understand your lifestyle, goals, preferences, and the atmosphere you want your space to hold.',
   },
   {
     number: '02',
     title: 'Curate',
-    description: 'We shape a design direction with thoughtful palettes, finishes, furnishings, and spatial flow.',
+    description: 'We shape an intentional design direction with thoughtful palettes, honest materials, finishes, furnishings, and seamless spatial flow.',
   },
   {
     number: '03',
     title: 'Refine',
-    description: 'Every detail is reviewed and elevated to ensure the final result feels seamless and complete.',
+    description: 'Every drawing, specification, and detail is rigorously reviewed and elevated to balance creativity with discipline and elegance with functionality.',
   },
   {
     number: '04',
     title: 'Deliver',
-    description: 'We guide the project through implementation so your space is brought to life with confidence and care.',
+    description: 'We guide the project through disciplined execution and meticulous craftsmanship so your space is brought to life with total confidence and care.',
   },
 ]
 
-const journalPosts = [
+const teamMembers = [
   {
-    category: 'RESIDENTIAL',
-    title: 'Designing with Light: Lessons from the Lake',
-    date: 'September 18, 2026',
-    readTime: '4 min read',
-    image: 'kigo-residence.png',
-    alt: 'Kigo Residence living room at night',
-    excerpt: 'How the changing light of a lakeside home shaped every material, finish and window we chose.',
-    body: [
-      'Every project begins with a walk around the site at different hours. At Kigo, the lake taught us the most. In the early morning the light is cool and silver; by late afternoon it turns warm and amber, spilling deep into the rooms.',
-      'We let that rhythm guide our decisions. Soft, matte plaster walls hold the morning glow without glare. Natural stone and oiled timber warm up as the sun lowers. Linen and wool soften the edges, so the evening feels like an exhale rather than a performance.',
-      'The lesson is simple: a room should never fight its light. Choose finishes that listen to it, and the space will feel calm at any hour. That is the quiet we try to build into every home.',
-    ],
+    name: 'Lead Architect',
+    role: 'Senior Spatial Designer',
   },
   {
-    category: 'PHILOSOPHY',
-    title: 'The Quiet Luxury of Restraint',
-    date: 'August 27, 2026',
-    readTime: '3 min read',
-    image: 'hero-interior.png',
-    alt: 'Luxury interior detail',
-    excerpt: 'Why the most memorable rooms are often the ones that say the least.',
-    body: [
-      'Luxury is often mistaken for abundance. In our experience, it is the opposite: the confidence to leave things out. A single well-made chair, a wall left generously empty, a palette of three colours held with discipline.',
-      'Restraint asks more of a designer, not less. Every object has to earn its place, every proportion has to be right, because there is nothing to hide behind. The reward is a room that feels composed, and one that does not tire you over the years.',
-      'When we begin a project, we ask clients what they want to feel before we ask what they want to own. The answer to the first question usually removes half of the answers to the second.',
-    ],
+    name: 'Project Director',
+    role: 'Head of Execution & Procurement',
   },
   {
-    category: 'MATERIALS',
-    title: 'Materials That Age Gracefully in East Africa',
-    date: 'July 9, 2026',
-    readTime: '5 min read',
-    image: 'hero-interior.png',
-    alt: 'Luxury interior detail',
-    excerpt: 'Warm climates, strong sun and humid seasons: choosing finishes that improve with time.',
-    body: [
-      'A beautiful room has to survive real life, and in East Africa real life includes intense sun, seasonal humidity and fine dust. We choose materials with that in mind, favouring those that develop character rather than simply wear out.',
-      'Solid hardwoods, honed stone, lime-based plasters and natural fibres all share one quality: they patina. A scratch on oiled timber becomes part of its story. By contrast, glossy laminates and thin veneers tend to show every flaw and rarely recover.',
-      'Craft matters as much as the material. Working with skilled local artisans gives us joinery, weaving and metalwork that are made for the place they live in, and that can be repaired for generations rather than replaced.',
-    ],
+    name: 'Interior Stylist',
+    role: 'FF&E Specialist',
   },
 ]
 
-const navItems = ['HOME', 'ABOUT', 'SERVICES', 'PORTFOLIO', 'PROCESS', 'JOURNAL', 'CONTACT']
+/* ---------------------------------------------------------
+   Logo + wordmark (used in the header and the footer)
+   --------------------------------------------------------- */
+function BrandLogo({ onClick }: { onClick?: () => void }) {
+  const [failed, setFailed] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [enquiryOpen, setEnquiryOpen] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [activePost, setActivePost] = useState<number | null>(null)
-  const [scrolled, setScrolled] = useState(false)
-  const [ready, setReady] = useState(false)
-
-  // Header background once the page is scrolled
+  // onError never fires if the image failed before React hydrated,
+  // so check once on mount as well.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const img = imgRef.current
+    if (!LOGO_SRC.endsWith('.svg') && img && img.complete && img.naturalWidth === 0) {
+      setFailed(true)
+    }
   }, [])
 
-  // Gentle reveal-on-scroll (content stays visible if JS or observer is unavailable)
+  return (
+    <Link href="#home" className="nb-brand" aria-label="Soothing Interiors, home" onClick={onClick}>
+      <span className="nb-logo">
+        {failed ? (
+          <span className="nb-logo-fallback" aria-hidden="true">SI</span>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            ref={imgRef}
+            src={LOGO_SRC}
+            alt=""
+            width={44}
+            height={44}
+            onError={() => setFailed(true)}
+          />
+        )}
+      </span>
+      <span className="nb-wordmark">
+        <strong>SOOTHING</strong>
+        <small>INTERIORS</small>
+      </span>
+    </Link>
+  )
+}
+
+/* ---------------------------------------------------------
+   Header / navbar
+   --------------------------------------------------------- */
+function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [active, setActive] = useState('home')
+  const headerRef = useRef<HTMLElement>(null)
+
+  const closeMenu = () => setMenuOpen(false)
+
+  // Solid bar after scrolling + reading-progress line + "at bottom" detection
   useEffect(() => {
-    setReady(true)
-    const items = document.querySelectorAll<HTMLElement>('[data-reveal]')
-    if (!('IntersectionObserver' in window)) {
-      items.forEach((el) => el.classList.add('in-view'))
-      return
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const y = window.scrollY
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setScrolled(y > 24)
+      headerRef.current?.style.setProperty(
+        '--nb-progress',
+        max > 0 ? String(Math.min(y / max, 1)) : '0'
+      )
+      if (max > 0 && max - y < 8) setActive('contact')
     }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      if (raf) cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  // Highlight the link for the section currently in view
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return
+    const sections = NAV_ITEMS
+      .map((item) => document.getElementById(item.id))
+      .filter((el): el is HTMLElement => el !== null)
+    if (!sections.length) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view')
-            observer.unobserve(entry.target)
-          }
+          if (entry.isIntersecting) setActive(entry.target.id)
         })
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      { rootMargin: '-40% 0px -55% 0px' }
     )
-    items.forEach((el) => observer.observe(el))
+    sections.forEach((section) => observer.observe(section))
     return () => observer.disconnect()
   }, [])
 
-  // Lock page scroll while the mobile menu or modal is open
+  // Lock page scroll + Escape to close while the mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = menuOpen || enquiryOpen || activePost !== null ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [menuOpen, enquiryOpen, activePost])
-
-  // Close overlays with Escape
-  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMenuOpen(false)
-        setActivePost(null)
-        closeEnquiry()
-      }
+      if (e.key === 'Escape') setMenuOpen(false)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
+
+  // Close the mobile menu if the window is resized to desktop width
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1180px)')
+    const onChange = () => {
+      if (mq.matches) setMenuOpen(false)
+    }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  const closeEnquiry = () => {
-    setEnquiryOpen(false)
-    setTimeout(() => setSubmitted(false), 300)
-  }
-
   return (
-    <main className={ready ? 'site-shell is-ready' : 'site-shell'}>
-      {/* HERO SECTION */}
-      <section className="hero" id="home">
-        <header className={`site-header${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' menu-open' : ''}`}>
-          <Link href="#home" className="brand" aria-label="Soothing Interiors home" onClick={() => setMenuOpen(false)}>
-            <span className="crest">SI</span>
-            <span><strong>SOOTHING</strong><small>INTERIORS</small></span>
-          </Link>
+    <header
+      ref={headerRef}
+      className={`nb${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' is-open' : ''}`}
+    >
+      <div className="nb-bar">
+        <BrandLogo onClick={closeMenu} />
 
-          <nav className={menuOpen ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
-            {navItems.map((item) => (
-              <Link
-                key={item}
-                href={item === 'HOME' ? '#home' : `#${item.toLowerCase()}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item}
-              </Link>
+        <nav className="nb-links" aria-label="Primary navigation">
+          <ul>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`#${item.id}`}
+                  className={active === item.id ? 'is-active' : undefined}
+                  aria-current={active === item.id ? 'true' : undefined}
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
-            <Link href="/login" className="nav-admin" onClick={() => setMenuOpen(false)}>ADMIN LOGIN</Link>
-          </nav>
+          </ul>
+        </nav>
 
-          <div className="header-actions">
-            <button className="outline-btn" onClick={() => { setMenuOpen(false); setEnquiryOpen(true) }}>
-              ENQUIRE <ArrowUpRight aria-hidden="true" />
-            </button>
-            <button className="icon-btn" aria-label="Search"><Search aria-hidden="true" /></button>
-            <Link href="/login" className="admin-link">ADMIN LOGIN</Link>
-            <button
-              className="menu-btn"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={menuOpen}
-            >
-              {menuOpen ? <X /> : <Menu />}
-            </button>
-          </div>
-        </header>
+        <div className="nb-actions">
+          <Link href="#contact" className="nb-cta">
+            Enquire <ArrowUpRight aria-hidden="true" />
+          </Link>
+          <Link href="/login" className="nb-admin" aria-label="Admin login" title="Admin login">
+            <User aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            className="nb-toggle"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+          >
+            {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
+        </div>
+
+        <span className="nb-progress" aria-hidden="true" />
+      </div>
+
+      {/* Full-screen mobile / tablet menu */}
+      <div id="mobile-menu" className="nb-panel" aria-hidden={!menuOpen}>
+        <nav aria-label="Mobile navigation">
+          <ol>
+            {NAV_ITEMS.map((item, i) => (
+              <li key={item.id} style={{ '--i': i } as CSSProperties}>
+                <Link
+                  href={`#${item.id}`}
+                  onClick={closeMenu}
+                  className={active === item.id ? 'is-active' : undefined}
+                >
+                  <span>{String(i + 1).padStart(2, '0')}</span>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div className="nb-panel-foot">
+          <Link href="#contact" className="nb-cta nb-cta-block" onClick={closeMenu}>
+            Enquire <ArrowUpRight aria-hidden="true" />
+          </Link>
+          <a href="mailto:info@soothinginteriorsltd.com">info@soothinginteriorsltd.com</a>
+          <a href="tel:+256775818496">+256 775 818 496</a>
+          <Link href="/login" onClick={closeMenu}>Admin login</Link>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+/* ---------------------------------------------------------
+   Page
+   --------------------------------------------------------- */
+export default function Home() {
+  return (
+    <main className="site-shell">
+      {/* HERO SECTION & HEADER */}
+      <section className="hero" id="home">
+        <SiteHeader />
 
         <div className="hero-inner page-width">
-          <div className="hero-index" aria-hidden="true"><span className="active">01</span><span>02</span><span>03</span></div>
+          <div className="hero-index"><span className="active">01</span><span>02</span><span>03</span></div>
           <div className="hero-copy">
-            <p className="eyebrow hero-anim" style={{ animationDelay: '.1s' }}>EXCEPTIONAL INTERIORS</p>
-            <h1 className="hero-anim" style={{ animationDelay: '.25s' }}>Curated for Life.<br /><em>Crafted for Legacy.</em></h1>
-            <p className="hero-lede hero-anim" style={{ animationDelay: '.4s' }}>Bespoke interior design for distinguished residential, commercial and hospitality spaces across East Africa and beyond.</p>
-            <Link href="#portfolio" className="text-link hero-anim" style={{ animationDelay: '.55s' }}>EXPLORE OUR WORK <ArrowRight aria-hidden="true" /></Link>
+            <p className="eyebrow">EXCEPTIONAL INTERIORS</p>
+            <h1>Curated for Life.<br /><em>Crafted for Legacy.</em></h1>
+            <p className="hero-lede">Bespoke interior design and complete spatial experiences for distinguished residential, commercial, hospitality, healthcare, retail, and corporate environments across Africa and beyond.</p>
+            <Link href="#portfolio" className="text-link">EXPLORE OUR WORK <ArrowRight aria-hidden="true" /></Link>
           </div>
           <div className="hero-location">KIGO RESIDENCE <span>|</span> RESIDENTIAL <span>|</span> UGANDA <ArrowUpRight aria-hidden="true" /></div>
         </div>
@@ -200,24 +300,99 @@ export default function Home() {
         <div className="hero-scroll">SCROLL TO DISCOVER <ArrowDownRight aria-hidden="true" /></div>
       </section>
 
+      {/* OUR STORY & BRAND PHILOSOPHY */}
+      <section className="manifesto page-width" id="about">
+        <p className="eyebrow dark">OUR STORY & APPROACH</p>
+        <h2>Design that begins with <em>people, not spaces.</em></h2>
+        <p className="manifesto-copy">
+          Soothing Interiors was established on the conviction that thoughtfully designed spaces have the power to shape how people live, work, think, connect, and flourish. We reject short-lived trends in favor of timeless principles, believing that true luxury is defined by purpose, intention, comfort, and extraordinary craftsmanship rather than excess.
+        </p>
+        <div className="motto-grid">
+          <div className="motto-card">
+            <h3>Curated for Life</h3>
+            <p>Every environment is designed around the people who live, work, gather, heal, learn, create, and celebrate within it. Every material selection, proportion, and finish is carefully considered to enrich everyday life.</p>
+          </div>
+          <div className="motto-card">
+            <h3>Crafted for Legacy</h3>
+            <p>Our responsibility extends far beyond project completion. We create spaces that remain relevant, valuable, and inspiring for generations—spaces families inherit and businesses grow within.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* TEAM & LEADERSHIP PROFILE SECTION */}
+      <section className="team-section page-width" id="team">
+        <div className="section-intro">
+          <p className="eyebrow dark">LEADERSHIP & STUDIO TEAM</p>
+          <h2>The Minds Behind<br /><em>The Legacy.</em></h2>
+          <p>Our studio brings together creative vision, technical discipline, and precise execution.</p>
+        </div>
+
+        {/* FOUNDER PROFILE (FULL DETAILS) */}
+        <div className="founder-profile-card">
+          <div className="founder-image-container">
+            <div className="image-placeholder founder-placeholder">
+              <span>FOUNDER PORTRAIT</span>
+            </div>
+          </div>
+          <div className="founder-details">
+            <p className="eyebrow">FOUNDER & PRINCIPAL DESIGNER</p>
+            <h3>Founder Name</h3>
+            <p className="founder-bio">
+              Driven by a profound belief in spatial transformation, the Founder established Soothing Interiors to redefine luxury across East Africa. With a background spanning spatial architecture, procurement, and art direction, they guide every project through careful listening, disciplined planning, and an unwavering commitment to craftsmanship.
+            </p>
+            <blockquote className="founder-quote">
+              “Luxury is defined by purpose, comfort, and timeless beauty—not excess.”
+            </blockquote>
+            <div className="founder-links">
+              <a href="mailto:info@soothinginteriorsltd.com" aria-label="Email Founder"><Mail size={18} /> Contact Direct</a>
+            </div>
+          </div>
+        </div>
+
+        {/* TEAM MEMBERS */}
+        <div className="team-grid">
+          {teamMembers.map((member, index) => (
+            <div className="team-card" key={index}>
+              <div className="image-placeholder member-placeholder">
+                <span>TEAM MEMBER</span>
+              </div>
+              <div className="member-info">
+                <h4>{member.name}</h4>
+                <p className="member-role">{member.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* VISION & MISSION */}
+      <section className="vision-mission-section" id="philosophy">
+        <div className="page-width vision-mission-grid">
+          <div className="vm-card">
+            <p className="eyebrow">OUR VISION</p>
+            <h3>To become Africa's most respected luxury interior design studio.</h3>
+            <p>Recognised globally for creating timeless spaces through exceptional design, innovative thinking, meticulous craftsmanship, and an uncompromising commitment to excellence.</p>
+          </div>
+          <div className="vm-card">
+            <p className="eyebrow">OUR MISSION</p>
+            <h3>Delivering complete spatial experiences with precision.</h3>
+            <p>To design, curate, and deliver extraordinary environments through technical precision, disciplined project management, and seamless execution—providing an experience defined by trust, transparency, and lasting value.</p>
+          </div>
+        </div>
+      </section>
+
       {/* SPECIALISATIONS SECTION */}
       <section className="specialisations page-width" id="services">
-        <div className="section-intro" data-reveal>
+        <div className="section-intro">
           <p className="eyebrow dark">OUR SPECIALISATIONS</p>
           <h2>Spaces<br /><em>with purpose.</em></h2>
-          <p>We create considered environments that feel deeply personal, beautifully resolved, and made to endure.</p>
+          <p>We serve residential, commercial, hospitality, healthcare, retail, institutional, and corporate clients through an integrated design approach.</p>
           <Link href="#contact" className="text-link dark-link">VIEW ALL SERVICES <ArrowRight aria-hidden="true" /></Link>
         </div>
         <div className="spec-grid">
-          {specialisations.map(([number, title, body, image], i) => (
-            <Link
-              href="#contact"
-              className="spec-card"
-              key={number}
-              data-reveal
-              style={{ transitionDelay: `${i * 90}ms` }}
-            >
-              <img src={`/${image}`} alt="Luxury interior detail" loading="lazy" />
+          {specialisations.map(([number, title, body, image]) => (
+            <Link href="#contact" className="spec-card" key={number}>
+              <img src={`/${image}`} alt="Luxury interior detail" />
               <div className="spec-overlay" />
               <div className="spec-content">
                 <span>{number}</span>
@@ -234,17 +409,17 @@ export default function Home() {
       {/* FEATURED PORTFOLIO */}
       <section className="featured" id="portfolio">
         <div className="featured-grid page-width">
-          <div className="featured-copy" data-reveal>
+          <div className="featured-copy">
             <p className="eyebrow">FEATURED PROJECT</p>
             <h2>Kigo<br /><em>Residence</em></h2>
             <p>A quiet dialogue between architecture, landscape and the lives lived within. A lakeside retreat shaped by light, texture and the enduring beauty of place.</p>
             <Link href="#contact" className="text-link">VIEW PROJECT <ArrowRight aria-hidden="true" /></Link>
           </div>
-          <div className="project-image" data-reveal style={{ transitionDelay: '120ms' }}>
-            <img src="/kigo-residence.png" alt="Kigo Residence living room at night" loading="lazy" />
+          <div className="project-image">
+            <img src="/kigo-residence.png" alt="Kigo Residence living room at night" />
             <div className="image-caption">KIGO RESIDENCE <span>01 / 04</span></div>
           </div>
-          <div className="project-meta" data-reveal>
+          <div className="project-meta">
             <div><span>LOCATION</span><strong>KIGO, UGANDA</strong></div>
             <div><span>TYPE</span><strong>RESIDENTIAL</strong></div>
             <div><span>YEAR</span><strong>2025</strong></div>
@@ -258,20 +433,15 @@ export default function Home() {
 
       {/* PROCESS SECTION */}
       <section className="process-section page-width" id="process">
-        <div className="section-intro" data-reveal>
-          <p className="eyebrow dark">PROCESS</p>
-          <h2>How We<br /><em>Work.</em></h2>
+        <div className="section-intro">
+          <p className="eyebrow dark">HOW WE WORK</p>
+          <h2>Our Studio<br /><em>Process.</em></h2>
           <p>A clear, considered process designed to protect the quality of the outcome and make the experience feel composed from beginning to end.</p>
         </div>
 
         <div className="process-grid">
-          {processSteps.map((step, i) => (
-            <article
-              className="process-card"
-              key={step.number}
-              data-reveal
-              style={{ transitionDelay: `${i * 90}ms` }}
-            >
+          {processSteps.map((step) => (
+            <article className="process-card" key={step.number}>
               <span className="process-step">{step.number}</span>
               <div className="process-content">
                 <h3>{step.title}</h3>
@@ -282,82 +452,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MANIFESTO / ABOUT */}
-      <section className="manifesto page-width" id="about">
-        <div data-reveal>
-          <p className="eyebrow dark">THE SOOTHING APPROACH</p>
-          <h2>Design that gives<br /><em>life room to unfold.</em></h2>
-          <p className="manifesto-copy">Our work is grounded in restraint, shaped by context, and always in service of how people want to feel. From first sketch to final detail, we make spaces with a sense of quiet confidence.</p>
-          <Link href="#contact" className="text-link dark-link">DISCOVER OUR STORY <ArrowRight aria-hidden="true" /></Link>
-        </div>
-      </section>
-
-      {/* JOURNAL */}
-      <section className="journal page-width" id="journal">
-        <div className="journal-head" data-reveal>
-          <div>
-            <p className="eyebrow dark">JOURNAL</p>
-            <h2>Notes on<br /><em>quiet living.</em></h2>
-          </div>
-          <p>Thoughts on light, materials and the craft of making spaces that feel like home. Tap a story to read it.</p>
-        </div>
-
-        <div className="journal-grid">
-          {journalPosts.map((post, i) => (
-            <button
-              type="button"
-              className="journal-card"
-              key={post.title}
-              onClick={() => setActivePost(i)}
-              data-reveal
-              style={{ transitionDelay: `${i * 90}ms` }}
-              aria-label={`Read: ${post.title}`}
-            >
-              <div className="journal-thumb">
-                <img src={`/${post.image}`} alt={post.alt} loading="lazy" />
-                <span className="journal-tag">{post.category}</span>
-              </div>
-              <div className="journal-body">
-                <span className="journal-meta">{post.date} <i>·</i> {post.readTime}</span>
-                <h3>{post.title}</h3>
-                <p>{post.excerpt}</p>
-                <span className="journal-read">READ STORY <ArrowRight aria-hidden="true" /></span>
-              </div>
-            </button>
-          ))}
+      {/* BRAND PROMISE BANNER */}
+      <section className="brand-promise-banner">
+        <div className="page-width">
+          <p className="eyebrow light">OUR BRAND PROMISE</p>
+          <h2>We listen before we design. We understand before we create. We plan before we build. We refine before we deliver.</h2>
         </div>
       </section>
 
       {/* FOOTER & CONTACT */}
       <footer className="footer" id="contact">
-        <div className="page-width footer-cta">
-          <div>
-            <p className="eyebrow">BEGIN YOUR PROJECT</p>
-            <h2>Let&apos;s make<br /><em>something enduring.</em></h2>
-          </div>
-          <button className="cta-btn" onClick={() => setEnquiryOpen(true)}>
-            START AN ENQUIRY <ArrowUpRight aria-hidden="true" />
-          </button>
-        </div>
-
         <div className="page-width footer-grid">
-          <div className="footer-brand">
-            <Link href="#home" className="brand">
-              <span className="crest">SI</span>
-              <span><strong>SOOTHING</strong><small>INTERIORS</small></span>
-            </Link>
-            <p className="footer-note">Curated for life.<br />Crafted for legacy.</p>
-          </div>
-
           <div>
-            <p className="eyebrow">EXPLORE</p>
-            <ul className="footer-links">
-              {navItems.filter((n) => n !== 'CONTACT').map((item) => (
-                <li key={item}>
-                  <Link href={item === 'HOME' ? '#home' : `#${item.toLowerCase()}`}>{item}</Link>
-                </li>
-              ))}
-            </ul>
+            <BrandLogo />
+            <p className="footer-note">Curated for life.<br />Crafted for legacy.</p>
           </div>
 
           <div>
@@ -373,178 +481,24 @@ export default function Home() {
             <p className="eyebrow">START A CONVERSATION</p>
             <a href="mailto:info@soothinginteriorsltd.com" className="footer-email">info@soothinginteriorsltd.com</a>
             <a href="tel:+256775818496" className="footer-phone">+256 775 818 496</a>
-            <div className="socials">
-              <a href="#" aria-label="Instagram">INSTAGRAM</a>
-              <a href="#" aria-label="Pinterest">PINTEREST</a>
-              <a href="#" aria-label="LinkedIn">LINKEDIN</a>
-            </div>
+          </div>
+
+          <div>
+            <p className="eyebrow">FOLLOW ALONG</p>
+            <p className="socials">INSTAGRAM &nbsp; / &nbsp; PINTEREST &nbsp; / &nbsp; LINKEDIN</p>
           </div>
         </div>
 
         <div className="page-width footer-bottom">
           <span>© 2026 SOOTHING INTERIORS. ALL RIGHTS RESERVED.</span>
-          <span className="footer-tagline">DESIGNED FOR THE EXTRAORDINARY</span>
-          <Link href="#home" className="to-top" aria-label="Back to top">
-            BACK TO TOP <ArrowUp aria-hidden="true" />
-          </Link>
+          <span className="footer-credit">
+            DEVELOPED BY BALIDDAWA ALLAN
+            <a href="tel:+256700966715">0700966715</a>
+            <span className="footer-credit-sep">/</span>
+            <a href="tel:+256785639406">0785639406</a>
+          </span>
         </div>
       </footer>
-
-      {/* JOURNAL READER */}
-      {activePost !== null && (
-        <div className="enquiry-overlay" onClick={() => setActivePost(null)} role="dialog" aria-modal="true" aria-label={journalPosts[activePost].title}>
-          <article className="enquiry-modal journal-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="enquiry-close" onClick={() => setActivePost(null)} aria-label="Close story">
-              <X />
-            </button>
-            <div className="journal-modal-image">
-              <img src={`/${journalPosts[activePost].image}`} alt={journalPosts[activePost].alt} />
-            </div>
-            <div className="journal-modal-content">
-              <p className="eyebrow dark">{journalPosts[activePost].category}</p>
-              <h2>{journalPosts[activePost].title}</h2>
-              <p className="journal-meta">{journalPosts[activePost].date} <i>·</i> {journalPosts[activePost].readTime}</p>
-              {journalPosts[activePost].body.map((para, idx) => (
-                <p className="journal-para" key={idx}>{para}</p>
-              ))}
-              <div className="journal-modal-actions">
-                <button
-                  type="button"
-                  className="journal-nav-btn"
-                  onClick={() => setActivePost((activePost + journalPosts.length - 1) % journalPosts.length)}
-                >
-                  <ArrowLeft aria-hidden="true" /> PREVIOUS
-                </button>
-                <button
-                  type="button"
-                  className="journal-nav-btn"
-                  onClick={() => setActivePost((activePost + 1) % journalPosts.length)}
-                >
-                  NEXT <ArrowRight aria-hidden="true" />
-                </button>
-              </div>
-            </div>
-          </article>
-        </div>
-      )}
-
-      {/* ENQUIRY MODAL */}
-      {enquiryOpen && (
-        <div className="enquiry-overlay" onClick={closeEnquiry} role="dialog" aria-modal="true" aria-label="Project enquiry">
-          <div className="enquiry-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="enquiry-close"
-              onClick={closeEnquiry}
-              aria-label="Close enquiry form"
-            >
-              <X />
-            </button>
-
-            {submitted ? (
-              <div className="enquiry-header enquiry-thanks">
-                <p className="eyebrow dark">THANK YOU</p>
-                <h2>Your enquiry<br /><em>is with us.</em></h2>
-                <p className="enquiry-lede">
-                  We review every inquiry carefully and will be in touch within 2 to 3 business days.
-                </p>
-                <p className="enquiry-tagline">Curated for life. Crafted for legacy.</p>
-              </div>
-            ) : (
-              <>
-                <div className="enquiry-header">
-                  <p className="eyebrow dark">ENQUIRY</p>
-                  <h2>Tell us about<br /><em>your project.</em></h2>
-                  <p className="enquiry-lede">
-                    We review every inquiry carefully and aim to respond within 2 to 3 business days.
-                  </p>
-                  <p className="enquiry-tagline">Curated for life. Crafted for legacy.</p>
-                </div>
-
-                <form
-                  className="enquiry-form"
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                    // Hook up to /api/contact here
-                    setSubmitted(true)
-                  }}
-                >
-                  <div className="form-row">
-                    <label className="form-field">
-                      <span>Full name</span>
-                      <input type="text" name="fullName" placeholder="Your name" required />
-                    </label>
-                  </div>
-
-                  <div className="form-row form-row-2">
-                    <label className="form-field">
-                      <span>Email address</span>
-                      <input type="email" name="email" placeholder="you@example.com" required />
-                    </label>
-                    <label className="form-field">
-                      <span>Phone number</span>
-                      <input type="tel" name="phone" placeholder="+256 ..." />
-                    </label>
-                  </div>
-
-                  <div className="form-row form-row-2">
-                    <label className="form-field">
-                      <span>Project type</span>
-                      <select name="projectType" defaultValue="">
-                        <option value="" disabled>Select a type</option>
-                        <option>Residential</option>
-                        <option>Commercial</option>
-                        <option>Hospitality</option>
-                        <option>Landscape</option>
-                      </select>
-                    </label>
-                    <label className="form-field">
-                      <span>Location</span>
-                      <input type="text" name="location" placeholder="City, country" />
-                    </label>
-                  </div>
-
-                  <div className="form-row form-row-2">
-                    <label className="form-field">
-                      <span>Budget range</span>
-                      <select name="budget" defaultValue="">
-                        <option value="" disabled>Select a range</option>
-                        <option>Under $25,000</option>
-                        <option>$25,000 – $75,000</option>
-                        <option>$75,000 – $150,000</option>
-                        <option>$150,000+</option>
-                      </select>
-                    </label>
-                    <label className="form-field">
-                      <span>Timeline</span>
-                      <select name="timeline" defaultValue="">
-                        <option value="" disabled>Select a timeline</option>
-                        <option>ASAP</option>
-                        <option>1 – 3 months</option>
-                        <option>3 – 6 months</option>
-                        <option>6 – 12 months</option>
-                        <option>Flexible</option>
-                      </select>
-                    </label>
-                  </div>
-
-                  <label className="form-field">
-                    <span>Tell us more about your project</span>
-                    <textarea
-                      name="message"
-                      rows={4}
-                      placeholder="A short paragraph about your space, scope and vision."
-                    />
-                  </label>
-
-                  <button type="submit" className="enquiry-submit">
-                    SUBMIT ENQUIRY <ArrowUpRight aria-hidden="true" />
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </main>
   )
 }
