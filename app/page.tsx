@@ -13,11 +13,7 @@ import {
   X,
 } from 'lucide-react'
 
-/**
- * Path of your logo inside /public.
- * If /logo.png doesn't exist, try '/images/logo-light.svg' or '/images/logo-gold.svg'.
- */
-const LOGO_SRC = '/logo.png'
+const LOGO_SRC = '/Soothing_Interiors-02.png'
 
 const NAV_ITEMS = [
   { label: 'Home', id: 'home' },
@@ -39,57 +35,25 @@ const specialisations = [
 ]
 
 const processSteps = [
-  {
-    number: '01',
-    title: 'Discover',
-    description: 'We listen carefully and observe thoughtfully to understand your lifestyle, goals, preferences, and the atmosphere you want your space to hold.',
-  },
-  {
-    number: '02',
-    title: 'Curate',
-    description: 'We shape an intentional design direction with thoughtful palettes, honest materials, finishes, furnishings, and seamless spatial flow.',
-  },
-  {
-    number: '03',
-    title: 'Refine',
-    description: 'Every drawing, specification, and detail is rigorously reviewed and elevated to balance creativity with discipline and elegance with functionality.',
-  },
-  {
-    number: '04',
-    title: 'Deliver',
-    description: 'We guide the project through disciplined execution and meticulous craftsmanship so your space is brought to life with total confidence and care.',
-  },
+  { number: '01', title: 'Discover', description: 'We listen carefully and observe thoughtfully to understand your lifestyle, goals, preferences, and the atmosphere you want your space to hold.' },
+  { number: '02', title: 'Curate', description: 'We shape an intentional design direction with thoughtful palettes, honest materials, finishes, furnishings, and seamless spatial flow.' },
+  { number: '03', title: 'Refine', description: 'Every drawing, specification, and detail is rigorously reviewed and elevated to balance creativity with discipline and elegance with functionality.' },
+  { number: '04', title: 'Deliver', description: 'We guide the project through disciplined execution and meticulous craftsmanship so your space is brought to life with total confidence and care.' },
 ]
 
 const teamMembers = [
-  {
-    name: 'Lead Architect',
-    role: 'Senior Spatial Designer',
-  },
-  {
-    name: 'Project Director',
-    role: 'Head of Execution & Procurement',
-  },
-  {
-    name: 'Interior Stylist',
-    role: 'FF&E Specialist',
-  },
+  { name: 'Lead Architect', role: 'Senior Spatial Designer' },
+  { name: 'Project Director', role: 'Head of Execution & Procurement' },
+  { name: 'Interior Stylist', role: 'FF&E Specialist' },
 ]
 
-/* ---------------------------------------------------------
-   Logo + wordmark (used in the header and the footer)
-   --------------------------------------------------------- */
 function BrandLogo({ onClick }: { onClick?: () => void }) {
   const [failed, setFailed] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
 
-  // onError never fires if the image failed before React hydrated,
-  // so check once on mount as well.
   useEffect(() => {
     const img = imgRef.current
-    if (!LOGO_SRC.endsWith('.svg') && img && img.complete && img.naturalWidth === 0) {
-      setFailed(true)
-    }
+    if (!LOGO_SRC.endsWith('.svg') && img && img.complete && img.naturalWidth === 0) setFailed(true)
   }, [])
 
   return (
@@ -98,15 +62,7 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
         {failed ? (
           <span className="nb-logo-fallback" aria-hidden="true">SI</span>
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            ref={imgRef}
-            src={LOGO_SRC}
-            alt=""
-            width={44}
-            height={44}
-            onError={() => setFailed(true)}
-          />
+          <img ref={imgRef} src={LOGO_SRC} alt="" width={44} height={44} onError={() => setFailed(true)} />
         )}
       </span>
       <span className="nb-wordmark">
@@ -117,9 +73,6 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
   )
 }
 
-/* ---------------------------------------------------------
-   Header / navbar
-   --------------------------------------------------------- */
 function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -128,7 +81,6 @@ function SiteHeader() {
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Solid bar after scrolling + reading-progress line + "at bottom" detection
   useEffect(() => {
     let raf = 0
     const update = () => {
@@ -136,15 +88,10 @@ function SiteHeader() {
       const y = window.scrollY
       const max = document.documentElement.scrollHeight - window.innerHeight
       setScrolled(y > 24)
-      headerRef.current?.style.setProperty(
-        '--nb-progress',
-        max > 0 ? String(Math.min(y / max, 1)) : '0'
-      )
+      headerRef.current?.style.setProperty('--nb-progress', max > 0 ? String(Math.min(y / max, 1)) : '0')
       if (max > 0 && max - y < 8) setActive('contact')
     }
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
@@ -155,32 +102,21 @@ function SiteHeader() {
     }
   }, [])
 
-  // Highlight the link for the section currently in view
   useEffect(() => {
     if (!('IntersectionObserver' in window)) return
-    const sections = NAV_ITEMS
-      .map((item) => document.getElementById(item.id))
-      .filter((el): el is HTMLElement => el !== null)
+    const sections = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter((el): el is HTMLElement => el !== null)
     if (!sections.length) return
-
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id)
-        })
-      },
+      (entries) => { entries.forEach((entry) => { if (entry.isIntersecting) setActive(entry.target.id) }) },
       { rootMargin: '-40% 0px -55% 0px' }
     )
     sections.forEach((section) => observer.observe(section))
     return () => observer.disconnect()
   }, [])
 
-  // Lock page scroll + Escape to close while the mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
     window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = ''
@@ -188,73 +124,44 @@ function SiteHeader() {
     }
   }, [menuOpen])
 
-  // Close the mobile menu if the window is resized to desktop width
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1180px)')
-    const onChange = () => {
-      if (mq.matches) setMenuOpen(false)
-    }
+    const onChange = () => { if (mq.matches) setMenuOpen(false) }
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
   return (
-    <header
-      ref={headerRef}
-      className={`nb${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' is-open' : ''}`}
-    >
+    <header ref={headerRef} className={`nb${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' is-open' : ''}`}>
       <div className="nb-bar">
         <BrandLogo onClick={closeMenu} />
-
         <nav className="nb-links" aria-label="Primary navigation">
           <ul>
             {NAV_ITEMS.map((item) => (
               <li key={item.id}>
-                <Link
-                  href={`#${item.id}`}
-                  className={active === item.id ? 'is-active' : undefined}
-                  aria-current={active === item.id ? 'true' : undefined}
-                >
+                <Link href={item.id === 'services' ? '/services' : `#${item.id}`} className={active === item.id ? 'is-active' : undefined}>
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
-
         <div className="nb-actions">
-          <Link href="#contact" className="nb-cta">
-            Enquire <ArrowUpRight aria-hidden="true" />
-          </Link>
-          <Link href="/login" className="nb-admin" aria-label="Admin login" title="Admin login">
-            <User aria-hidden="true" />
-          </Link>
-          <button
-            type="button"
-            className="nb-toggle"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-          >
+          <Link href="#contact" className="nb-cta">Enquire <ArrowUpRight aria-hidden="true" /></Link>
+          <Link href="/login" className="nb-admin" aria-label="Admin login"><User aria-hidden="true" /></Link>
+          <button type="button" className="nb-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>
             {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </button>
         </div>
-
         <span className="nb-progress" aria-hidden="true" />
       </div>
 
-      {/* Full-screen mobile / tablet menu */}
       <div id="mobile-menu" className="nb-panel" aria-hidden={!menuOpen}>
         <nav aria-label="Mobile navigation">
           <ol>
             {NAV_ITEMS.map((item, i) => (
               <li key={item.id} style={{ '--i': i } as CSSProperties}>
-                <Link
-                  href={`#${item.id}`}
-                  onClick={closeMenu}
-                  className={active === item.id ? 'is-active' : undefined}
-                >
+                <Link href={item.id === 'services' ? '/services' : `#${item.id}`} onClick={closeMenu} className={active === item.id ? 'is-active' : undefined}>
                   <span>{String(i + 1).padStart(2, '0')}</span>
                   {item.label}
                 </Link>
@@ -262,30 +169,21 @@ function SiteHeader() {
             ))}
           </ol>
         </nav>
-
         <div className="nb-panel-foot">
-          <Link href="#contact" className="nb-cta nb-cta-block" onClick={closeMenu}>
-            Enquire <ArrowUpRight aria-hidden="true" />
-          </Link>
+          <Link href="#contact" className="nb-cta nb-cta-block" onClick={closeMenu}>Enquire <ArrowUpRight aria-hidden="true" /></Link>
           <a href="mailto:info@soothinginteriorsltd.com">info@soothinginteriorsltd.com</a>
           <a href="tel:+256775818496">+256 775 818 496</a>
-          <Link href="/login" onClick={closeMenu}>Admin login</Link>
         </div>
       </div>
     </header>
   )
 }
 
-/* ---------------------------------------------------------
-   Page
-   --------------------------------------------------------- */
 export default function Home() {
   return (
     <main className="site-shell">
-      {/* HERO SECTION & HEADER */}
       <section className="hero" id="home">
         <SiteHeader />
-
         <div className="hero-inner page-width">
           <div className="hero-index"><span className="active">01</span><span>02</span><span>03</span></div>
           <div className="hero-copy">
@@ -296,11 +194,9 @@ export default function Home() {
           </div>
           <div className="hero-location">KIGO RESIDENCE <span>|</span> RESIDENTIAL <span>|</span> UGANDA <ArrowUpRight aria-hidden="true" /></div>
         </div>
-
         <div className="hero-scroll">SCROLL TO DISCOVER <ArrowDownRight aria-hidden="true" /></div>
       </section>
 
-      {/* OUR STORY & BRAND PHILOSOPHY */}
       <section className="manifesto page-width" id="about">
         <p className="eyebrow dark">OUR STORY & APPROACH</p>
         <h2>Design that begins with <em>people, not spaces.</em></h2>
@@ -319,7 +215,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TEAM & LEADERSHIP PROFILE SECTION */}
       <section className="team-section page-width" id="team">
         <div className="section-intro">
           <p className="eyebrow dark">LEADERSHIP & STUDIO TEAM</p>
@@ -327,7 +222,6 @@ export default function Home() {
           <p>Our studio brings together creative vision, technical discipline, and precise execution.</p>
         </div>
 
-        {/* FOUNDER PROFILE (FULL DETAILS) */}
         <div className="founder-profile-card">
           <div className="founder-image-container">
             <div className="image-placeholder founder-placeholder">
@@ -349,7 +243,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* TEAM MEMBERS */}
         <div className="team-grid">
           {teamMembers.map((member, index) => (
             <div className="team-card" key={index}>
@@ -365,7 +258,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VISION & MISSION */}
       <section className="vision-mission-section" id="philosophy">
         <div className="page-width vision-mission-grid">
           <div className="vm-card">
@@ -381,17 +273,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SPECIALISATIONS SECTION */}
       <section className="specialisations page-width" id="services">
         <div className="section-intro">
           <p className="eyebrow dark">OUR SPECIALISATIONS</p>
           <h2>Spaces<br /><em>with purpose.</em></h2>
           <p>We serve residential, commercial, hospitality, healthcare, retail, institutional, and corporate clients through an integrated design approach.</p>
-          <Link href="#contact" className="text-link dark-link">VIEW ALL SERVICES <ArrowRight aria-hidden="true" /></Link>
+          <Link href="/services" className="text-link dark-link">VIEW ALL SERVICES <ArrowRight aria-hidden="true" /></Link>
         </div>
         <div className="spec-grid">
           {specialisations.map(([number, title, body, image]) => (
-            <Link href="#contact" className="spec-card" key={number}>
+            <Link href="/services" className="spec-card" key={number}>
               <img src={`/${image}`} alt="Luxury interior detail" />
               <div className="spec-overlay" />
               <div className="spec-content">
@@ -406,14 +297,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PORTFOLIO */}
       <section className="featured" id="portfolio">
         <div className="featured-grid page-width">
           <div className="featured-copy">
             <p className="eyebrow">FEATURED PROJECT</p>
             <h2>Kigo<br /><em>Residence</em></h2>
             <p>A quiet dialogue between architecture, landscape and the lives lived within. A lakeside retreat shaped by light, texture and the enduring beauty of place.</p>
-            <Link href="#contact" className="text-link">VIEW PROJECT <ArrowRight aria-hidden="true" /></Link>
+            <Link href="/services" className="text-link">VIEW PROJECT <ArrowRight aria-hidden="true" /></Link>
           </div>
           <div className="project-image">
             <img src="/kigo-residence.png" alt="Kigo Residence living room at night" />
@@ -431,7 +321,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PROCESS SECTION */}
       <section className="process-section page-width" id="process">
         <div className="section-intro">
           <p className="eyebrow dark">HOW WE WORK</p>
@@ -452,7 +341,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BRAND PROMISE BANNER */}
       <section className="brand-promise-banner">
         <div className="page-width">
           <p className="eyebrow light">OUR BRAND PROMISE</p>
@@ -460,7 +348,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER & CONTACT */}
       <footer className="footer" id="contact">
         <div className="page-width footer-grid">
           <div>
