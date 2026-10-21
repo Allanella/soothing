@@ -13,7 +13,8 @@ import {
   X,
 } from 'lucide-react'
 
-const LOGO_SRC = '/Soothing_Interiors-02.png'
+// Updated to your new logo
+const LOGO_SRC = '/Soothing_Interiors-04.png'
 
 const NAV_ITEMS = [
   { label: 'Home', id: 'home' },
