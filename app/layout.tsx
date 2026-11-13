@@ -15,27 +15,14 @@ export const metadata: Metadata = {
   description:
     'Bespoke interior design and complete spatial experiences for distinguished residential, commercial, hospitality, healthcare and retail spaces across Africa and beyond.',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/Soothing_Interiors-04.png',
+    apple: '/Soothing_Interiors-04.png',
   },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#26302a',
+  themeColor: '#181b1e',
 }
 
 export default function RootLayout({
