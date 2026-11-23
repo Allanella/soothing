@@ -7,6 +7,33 @@ import { catalogProducts, formatPrice, normalizeProductRow, type CatalogProduct 
 
 const LOGO_SRC = '/Soothing_Interiors-02.png'
 
+const DISCOUNT_OFFERS = [
+  {
+    id: 'd1',
+    badge: '15% OFF',
+    title: 'Seating Edit',
+    detail: 'Lounge chairs, daybeds, and accent seating for residential projects this season.',
+    code: 'SEAT15',
+    tone: 'ivory' as const,
+  },
+  {
+    id: 'd2',
+    badge: '20% OFF',
+    title: 'Lighting Collection',
+    detail: 'Pendants, floor lamps, and fixtures curated from our studio archive.',
+    code: 'LIGHT20',
+    tone: 'charcoal' as const,
+  },
+  {
+    id: 'd3',
+    badge: 'BUNDLE',
+    title: 'Dining Pairing',
+    detail: 'Save when you enquire on a dining table with matching seating for one room.',
+    code: 'DINING',
+    tone: 'gold' as const,
+  },
+]
+
 const NAV_ITEMS = [
   { label: 'Home', id: 'home', path: '/' },
   { label: 'About', id: 'about', path: '/#about' },
@@ -165,6 +192,27 @@ export default function ProductsPage() {
         <p>
           Selected furnishings, lighting, and accessories drawn from our project galleries—each with a guide price for planning your next space.
         </p>
+      </section>
+
+      <section className="page-width discount-section" aria-label="Current offers">
+        <div className="discount-grid">
+          {DISCOUNT_OFFERS.map((offer) => (
+            <article className={`discount-card discount-card--${offer.tone}`} key={offer.id}>
+              <span className="discount-badge">{offer.badge}</span>
+              <h2>{offer.title}</h2>
+              <p>{offer.detail}</p>
+              <div className="discount-foot">
+                <span className="discount-code">Code {offer.code}</span>
+                <a
+                  href={`mailto:info@soothinginteriorsltd.com?subject=${encodeURIComponent(`Offer enquiry: ${offer.title} (${offer.code})`)}`}
+                  className="discount-cta"
+                >
+                  Claim offer <ArrowUpRight size={14} aria-hidden="true" />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="page-width products-toolbar" aria-label="Filter products">
