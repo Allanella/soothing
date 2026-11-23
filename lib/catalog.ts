@@ -6,6 +6,40 @@ export type CatalogProduct = {
   currency: 'UGX' | 'USD'
   description: string
   image: string
+  /** Percent off list price. When omitted, category/default discount is used. */
+  discountPercent?: number
+}
+
+/** Fallback sale for any product without a specific rate. */
+export const DEFAULT_PRODUCT_DISCOUNT = 10
+
+const CATEGORY_DISCOUNTS: Record<string, number> = {
+  Seating: 15,
+  Lighting: 20,
+  Tables: 15,
+  Storage: 12,
+  Screens: 12,
+  Display: 10,
+  Workspace: 12,
+  Outdoor: 15,
+  Accessories: 10,
+  Residential: 10,
+  Commercial: 10,
+  Hospitality: 12,
+  Healthcare: 10,
+  Retail: 10,
+}
+
+export function getDiscountPercent(product: Pick<CatalogProduct, 'category' | 'discountPercent'>) {
+  if (typeof product.discountPercent === 'number' && product.discountPercent > 0) {
+    return Math.min(90, Math.round(product.discountPercent))
+  }
+  return CATEGORY_DISCOUNTS[product.category] ?? DEFAULT_PRODUCT_DISCOUNT
+}
+
+export function getSalePrice(product: Pick<CatalogProduct, 'price' | 'category' | 'discountPercent'>) {
+  const percent = getDiscountPercent(product)
+  return Math.round(product.price * (1 - percent / 100))
 }
 
 export const PRODUCT_CATEGORIES = [
@@ -62,15 +96,20 @@ export function normalizeProductRow(row: Record<string, unknown>): CatalogProduc
   const image =
     String(row.imageUrl ?? row.image_url ?? row.image ?? '').replace(/^\//, '') ||
     galleryImageOptions[0]
+  const category = String(row.category ?? 'Accessories')
+  const explicitDiscount = Number(row.discountPercent ?? row.discount_percent)
 
   return {
     id: String(row.id ?? `row-${String(row.title ?? 'item')}-${String(row.price ?? 0)}`),
     title: String(row.title ?? 'Untitled'),
-    category: String(row.category ?? 'Accessories'),
+    category,
     price: Number(row.price) || 0,
     currency: (row.currency as CatalogProduct['currency']) || 'UGX',
     description: String(row.description ?? ''),
     image,
+    discountPercent: Number.isFinite(explicitDiscount) && explicitDiscount > 0
+      ? explicitDiscount
+      : CATEGORY_DISCOUNTS[category] ?? DEFAULT_PRODUCT_DISCOUNT,
   }
 }
 

@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight, Menu, User, X } from 'lucide-react'
-import { catalogProducts, formatPrice, normalizeProductRow, type CatalogProduct } from '@/lib/catalog'
+import {
+  catalogProducts,
+  formatPrice,
+  getDiscountPercent,
+  getSalePrice,
+  normalizeProductRow,
+  type CatalogProduct,
+} from '@/lib/catalog'
 
 const LOGO_SRC = '/Soothing_Interiors-02.png'
 
@@ -230,37 +237,45 @@ export default function ProductsPage() {
 
       <section className="page-width products-section">
         <div className="products-grid">
-          {products.map((product) => (
-            <article className="product-card" key={product.id}>
-              <div className="product-media">
-                <img
-                  src={`/${product.image}`}
-                  alt={product.title}
-                  loading="lazy"
-                  decoding="async"
-                  width={800}
-                  height={1000}
-                />
-              </div>
-              <div className="product-body">
-                <span className="product-category">{product.category}</span>
-                <h2>{product.title}</h2>
-                <p>{product.description}</p>
-                <div className="product-meta">
-                  <strong className="product-price">{formatPrice(product.price, product.currency)}</strong>
-                  <a
-                    href={`mailto:info@soothinginteriorsltd.com?subject=${encodeURIComponent(`Enquiry about ${product.title}`)}`}
-                    className="product-enquire"
-                  >
-                    Enquire <ArrowUpRight size={14} aria-hidden="true" />
-                  </a>
+          {products.map((product) => {
+            const discount = getDiscountPercent(product)
+            const salePrice = getSalePrice(product)
+            return (
+              <article className="product-card" key={product.id}>
+                <div className="product-media">
+                  <img
+                    src={`/${product.image}`}
+                    alt={product.title}
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={1000}
+                  />
+                  <span className="product-sale-badge">{discount}% OFF</span>
                 </div>
-              </div>
-            </article>
-          ))}
+                <div className="product-body">
+                  <span className="product-category">{product.category}</span>
+                  <h2>{product.title}</h2>
+                  <p>{product.description}</p>
+                  <div className="product-meta">
+                    <div className="product-pricing">
+                      <strong className="product-price">{formatPrice(salePrice, product.currency)}</strong>
+                      <span className="product-price-was">{formatPrice(product.price, product.currency)}</span>
+                    </div>
+                    <a
+                      href={`mailto:info@soothinginteriorsltd.com?subject=${encodeURIComponent(`Enquiry about ${product.title} (${discount}% off)`)}`}
+                      className="product-enquire"
+                    >
+                      Enquire <ArrowUpRight size={14} aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
         </div>
         <p className="products-note">
-          Prices are indicative and may vary with materials, finishes, and project scope. Contact the studio for a tailored quotation.
+          All pieces currently include a seasonal discount. Sale prices are indicative and may vary with materials, finishes, and project scope. Contact the studio for a tailored quotation.
         </p>
       </section>
 
