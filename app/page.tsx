@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { label: 'About', id: 'about' },
   { label: 'Team', id: 'team' },
   { label: 'Services', id: 'services' },
+  { label: 'Products', id: 'products' },
   { label: 'Portfolio', id: 'portfolio' },
   { label: 'Gallery', id: 'gallery' },
   { label: 'Philosophy', id: 'philosophy' },
@@ -44,7 +45,7 @@ const heroImages = [
   'DSC00623_HDR - Copy.jpg',
   'DSC00635_HDR - Copy.jpg',
   'DSC00650_HDR - Copy.jpg',
-  'DSC00683_HDR.jpg',
+  'DSC00683_HDR - Copy.jpg',
 ]
 
 // Combined gallery list (existing archive + newly added highlighted images)
@@ -75,7 +76,7 @@ const galleryImages = [
   'DSC01017_HDR.jpg',
   'DSC01032_HDR.jpg',
   'DSC01035_HDR.jpg',
-  'DSC01158_HDR.jpg',
+  'DSC00771_HDR.jpg',
   'DSC01191_HDR.jpg',
   'DSC00963_HDR.jpg',
 ]
@@ -133,7 +134,7 @@ const featuredProjects = [
     location: 'ENTEBBE, UGANDA',
     type: 'HOSPITALITY',
     year: '2025',
-    images: ['DSC01035_HDR.jpg', 'DSC01158_HDR.jpg', 'DSC01191_HDR.jpg'],
+    images: ['DSC01035_HDR.jpg', 'DSC00771_HDR.jpg', 'DSC01191_HDR.jpg'],
     alt: 'Entebbe Lakeside Villa interior',
     description: 'Indoor-outdoor living framed by tropical gardens, custom timber screens, and serene lakeside light.',
   },
@@ -244,7 +245,10 @@ function SiteHeader() {
           <ul>
             {NAV_ITEMS.map((item) => (
               <li key={item.id}>
-                <Link href={item.id === 'services' ? '/services' : `#${item.id}`} className={active === item.id ? 'is-active' : undefined}>
+                <Link
+                  href={item.id === 'services' ? '/services' : item.id === 'products' ? '/products' : `#${item.id}`}
+                  className={active === item.id ? 'is-active' : undefined}
+                >
                   {item.label}
                 </Link>
               </li>
@@ -266,7 +270,11 @@ function SiteHeader() {
           <ol>
             {NAV_ITEMS.map((item, i) => (
               <li key={item.id} style={{ '--i': i } as CSSProperties}>
-                <Link href={item.id === 'services' ? '/services' : `#${item.id}`} onClick={closeMenu} className={active === item.id ? 'is-active' : undefined}>
+                <Link
+                  href={item.id === 'services' ? '/services' : item.id === 'products' ? '/products' : `#${item.id}`}
+                  onClick={closeMenu}
+                  className={active === item.id ? 'is-active' : undefined}
+                >
                   <span>{String(i + 1).padStart(2, '0')}</span>
                   {item.label}
                 </Link>
@@ -301,6 +309,8 @@ function RotatingCardImage({ images, alt }: { images: string[]; alt: string }) {
           key={img}
           src={`/${img}`}
           alt={alt}
+          loading={idx === 0 ? 'eager' : 'lazy'}
+          decoding="async"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === activeIdx ? 'opacity-100 scale-105' : 'opacity-0 scale-100'}`}
           style={{ transitionProperty: 'opacity, transform', transitionDuration: '1.2s' }}
         />
@@ -332,13 +342,19 @@ export default function Home() {
         <SiteHeader />
         
         <div className="hero-bg-slider">
-          {heroImages.map((img, idx) => (
-            <div
-              key={img}
-              className={`hero-slide ${idx === currentHeroImg ? 'active' : ''}`}
-              style={{ backgroundImage: `url('/${img}')` }}
-            />
-          ))}
+          {heroImages.map((img, idx) => {
+            const near =
+              idx === currentHeroImg ||
+              idx === (currentHeroImg + 1) % heroImages.length ||
+              idx === (currentHeroImg - 1 + heroImages.length) % heroImages.length
+            return (
+              <div
+                key={img}
+                className={`hero-slide ${idx === currentHeroImg ? 'active' : ''}`}
+                style={near ? { backgroundImage: `url('/${img}')` } : undefined}
+              />
+            )
+          })}
           <div className="hero-gradient-overlay" />
         </div>
 
@@ -517,7 +533,14 @@ export default function Home() {
         <div className="services-grid">
           {galleryImages.map((imgName, index) => (
             <div className="service-image-card" key={index}>
-              <img src={`/${imgName}`} alt={`Soothing Interiors project archive ${index + 1}`} loading="lazy" />
+              <img
+                src={`/${imgName}`}
+                alt={`Soothing Interiors project archive ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={1000}
+              />
               <div className="service-image-overlay">
                 <span>PROJECT ARCHIVE 0{index + 1}</span>
                 <div className="service-image-icon">

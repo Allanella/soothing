@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: 'About', id: 'about', path: '/#about' },
   { label: 'Team', id: 'team', path: '/#team' },
   { label: 'Services', id: 'services', path: '/services' },
+  { label: 'Products', id: 'products', path: '/products' },
   { label: 'Portfolio', id: 'portfolio', path: '/#portfolio' },
   { label: 'Philosophy', id: 'philosophy', path: '/#philosophy' },
   { label: 'Process', id: 'process', path: '/#process' },
@@ -147,10 +148,13 @@ export default function ServicesPage() {
         <div className="services-grid">
           {Array.from({ length: 23 }).map((_, index) => (
             <div key={index} className="service-image-card">
-              <img 
-                src={`/room${index + 1}.jpeg`} 
-                alt={`Interior project detail ${index + 1}`} 
+              <img
+                src={`/room${index + 1}.jpeg`}
+                alt={`Interior project detail ${index + 1}`}
                 loading="lazy"
+                decoding="async"
+                width={810}
+                height={1080}
               />
               <div className="service-image-overlay">
                 <span>{String(index + 1).padStart(2, '0')} / PROJECT</span>

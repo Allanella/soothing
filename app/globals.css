@@ -327,6 +327,151 @@ h1 em, h2 em { color: var(--champaign-gold); font-weight: 400; font-style: itali
   color: #26302a;
 }
 
+/* ---------- Products catalog ---------- */
+.products-hero {
+  padding: 40px 0 28px;
+  text-align: center;
+}
+.products-hero h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 400;
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+.products-hero h1 em {
+  font-style: italic;
+  color: var(--champaign-gold);
+}
+.products-hero > p:not(.eyebrow) {
+  max-width: 640px;
+  margin: 0 auto;
+  color: #667065;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.products-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 0 36px;
+}
+
+.products-filter {
+  border: 1px solid rgba(24, 27, 30, 0.18);
+  background: transparent;
+  color: var(--charcoal);
+  font: 500 11px/1 system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.products-filter:hover,
+.products-filter.is-active {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: var(--warm-ivory);
+}
+
+.products-section {
+  padding: 0 0 120px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: clamp(24px, 3vw, 36px);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-media {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #e5e3df;
+  border-radius: 4px;
+}
+.product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s var(--ease);
+}
+.product-card:hover .product-media img {
+  transform: scale(1.04);
+}
+
+.product-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 2px 8px;
+}
+.product-category {
+  font: 500 10px/1 system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--champaign-gold);
+}
+.product-body h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  font-weight: 400;
+  color: var(--charcoal);
+}
+.product-body > p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #667065;
+}
+.product-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(24, 27, 30, 0.12);
+}
+.product-price {
+  font: 500 14px/1 system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--charcoal);
+}
+.product-enquire {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 11px/1 system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.product-enquire:hover {
+  color: var(--champaign-gold);
+}
+.products-note {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #8a8f88;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* ---------- Manifesto ---------- */
 .manifesto { padding-block: clamp(90px, 12vw, 155px) clamp(100px, 13vw, 180px); }
 .manifesto-copy { margin-left: 33%; font-size: 18px; }
